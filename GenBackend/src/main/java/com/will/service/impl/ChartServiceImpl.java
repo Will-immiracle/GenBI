@@ -1,9 +1,9 @@
 package com.will.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import generator.pojo.Chart;
-import generator.service.ChartService;
-import generator.mapper.ChartMapper;
+import com.will.pojo.Chart;
+import com.will.service.ChartService;
+import com.will.mapper.ChartMapper;
 import org.springframework.stereotype.Service;
 
 /**

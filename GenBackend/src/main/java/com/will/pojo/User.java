@@ -1,9 +1,7 @@
 package com.will.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
 import lombok.Data;
 
@@ -13,21 +11,26 @@ import lombok.Data;
 @TableName(value ="user")
 @Data
 public class User {
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
-    private String useraccount;
+    private String userAccount;
 
-    private String userpassword;
+    private String userPassword;
 
     private String username;
 
-    private String useravatar;
+    private String userAvatar;
 
-    private String userrole;
+    private String userRole;
 
-    private Date createtime;
+    private Date createTime;
 
-    private Date updatetime;
+    private Date updateTime;
 
-    private Integer isdelete;
+    @TableLogic
+    private Integer isDelete;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
 }
