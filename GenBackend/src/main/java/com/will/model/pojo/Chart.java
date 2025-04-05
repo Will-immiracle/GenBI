@@ -1,4 +1,4 @@
-package com.will.pojo;
+package com.will.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
 

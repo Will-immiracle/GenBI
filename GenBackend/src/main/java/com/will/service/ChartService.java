@@ -1,6 +1,6 @@
 package com.will.service;
 
-import com.will.pojo.Chart;
+import com.will.model.pojo.Chart;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

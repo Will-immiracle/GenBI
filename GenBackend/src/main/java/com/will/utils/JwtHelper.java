@@ -22,7 +22,7 @@ public class JwtHelper {
         System.out.println("tokenSignKey = " + tokenSignKey);
         String token = Jwts.builder()
 
-                .setSubject("YYGH-USER")
+                .setSubject("WILL-IN-MIRACLE")
                 .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration*1000*60)) //单位分钟
                 .claim("userId", userId)
                 .signWith(SignatureAlgorithm.HS512, tokenSignKey)

@@ -1,8 +1,6 @@
 package com.will.exception;
 
-import com.alibaba.druid.wall.violation.ErrorCode;
-import com.will.utils.ResultCodeEnum;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.will.common.ResultCodeEnum;
 
 /**
  * @program: GenBI

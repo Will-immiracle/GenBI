@@ -1,4 +1,4 @@
-package com.will.utils;
+package com.will.common;
 
 /**
  * @program: UserCenter

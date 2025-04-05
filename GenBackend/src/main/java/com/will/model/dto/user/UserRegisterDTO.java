@@ -1,4 +1,4 @@
-package com.will.pojo.dto.user;
+package com.will.model.dto.user;
 
 import lombok.Data;
 

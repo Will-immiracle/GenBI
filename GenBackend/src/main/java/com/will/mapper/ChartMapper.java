@@ -1,6 +1,6 @@
 package com.will.mapper;
 
-import com.will.pojo.Chart;
+import com.will.model.pojo.Chart;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

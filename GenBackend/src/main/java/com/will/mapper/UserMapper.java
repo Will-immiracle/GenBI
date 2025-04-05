@@ -1,6 +1,6 @@
 package com.will.mapper;
 
-import com.will.pojo.User;
+import com.will.model.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

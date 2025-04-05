@@ -1,4 +1,4 @@
-package com.will.utils;
+package com.will.common;
 
 public enum ResultCodeEnum {
     SUCCESS(200,"success"),
@@ -9,7 +9,8 @@ public enum ResultCodeEnum {
     NOTLOGIN(505,"notLogin"),
     USERNAME_USED(506,"userNameUsed"),
     DATABASE_ERROR(507,"DataBaseError"),
-    SYSTEM_ERROR(508,"systemError");
+    SYSTEM_ERROR(508,"systemError"),
+    OPERATION_ERROR(509,"operationError");
 
     private Integer code;
     private String message;

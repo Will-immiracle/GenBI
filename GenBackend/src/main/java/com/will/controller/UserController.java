@@ -2,12 +2,16 @@ package com.will.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.will.exception.BusinessException;
-import com.will.pojo.dto.user.UserRegisterDTO;
+import com.will.model.dto.user.UserLoginDTO;
+import com.will.model.dto.user.UserRegisterDTO;
+import com.will.model.vo.user.UserLoginVO;
 import com.will.service.UserService;
-import com.will.utils.Result;
-import com.will.utils.ResultCodeEnum;
+import com.will.common.Result;
+import com.will.common.ResultCodeEnum;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +38,7 @@ public class UserController {
     * 4. 业务逻辑协调（只负责controller层，对接UI层与service层）
     * */
     @RequestMapping("/register")
-    public Result<Long> register(UserRegisterDTO userRegisterDTO) {
+    public Result<Long> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         if(userRegisterDTO == null) throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR);
         String userAccount = userRegisterDTO.getUserAccount();
         String userPassword = userRegisterDTO.getUserPassword();
@@ -42,13 +46,20 @@ public class UserController {
         if(StringUtils.isEmpty(userAccount)) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR);
         if(StringUtils.isEmpty(userPassword)) throw BusinessException.build(ResultCodeEnum.PASSWORD_ERROR);
         if(StringUtils.isEmpty(checkPassword)) throw BusinessException.build(ResultCodeEnum.CHECK_PASSWORD_ERROR);
-        Long userId = userService.register(userAccount, userPassword, checkPassword);
+        Long userId = userService.userRegister(userAccount, userPassword, checkPassword);
         return Result.ok(userId);
     }
 
     @RequestMapping("/login")
-    public Result login(String userAccount, String userPassword) {
-        return userService.login(userAccount, userPassword);
+    public Result login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
+        if(userLoginDTO == null) throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR);
+        String userAccount = userLoginDTO.getUserAccount();
+        String userPassword = userLoginDTO.getUserPassword();
+        if(StringUtils.isEmpty(userAccount)) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR);
+        if(StringUtils.isEmpty(userPassword)) throw BusinessException.build(ResultCodeEnum.PASSWORD_ERROR);
+        UserLoginVO user = userService.userLogin(userAccount, userPassword, request);
+        return Result.ok(user);
     }
+
 
 }

@@ -1,8 +1,8 @@
 package com.will.exception.handler;
 
 import com.will.exception.BusinessException;
-import com.will.utils.Result;
-import com.will.utils.ResultCodeEnum;
+import com.will.common.Result;
+import com.will.common.ResultCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
