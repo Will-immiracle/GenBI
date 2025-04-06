@@ -18,7 +18,7 @@ public class User {
 
     private String userPassword;
 
-    private String username;
+    private String userName;
 
     private String userAvatar;
 
