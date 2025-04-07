@@ -6,18 +6,19 @@
 
     <resultMap id="BaseResultMap" type="com.will.model.pojo.Chart">
             <id property="id" column="id" />
+            <result property="userId" column="userId" />
             <result property="goal" column="goal" />
-            <result property="chartdata" column="chartData" />
-            <result property="charttype" column="chartType" />
-            <result property="genchart" column="genChart" />
-            <result property="genresult" column="genResult" />
-            <result property="createtime" column="createTime" />
-            <result property="updatetime" column="updateTime" />
-            <result property="isdelete" column="isDelete" />
+            <result property="chartData" column="chartData" />
+            <result property="chartType" column="chartType" />
+            <result property="genChart" column="genChart" />
+            <result property="genResult" column="genResult" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,goal,chartData,chartType,genChart,genResult,
+        id,userId,goal,chartData,chartType,genChart,genResult,
         createTime,updateTime,isDelete
     </sql>
 </mapper>
