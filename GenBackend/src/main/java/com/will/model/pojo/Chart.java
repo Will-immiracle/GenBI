@@ -14,6 +14,8 @@ public class Chart {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
+    private Long userId;
+
     private String goal;
 
     private String chartData;

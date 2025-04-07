@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.will.mapper")
+
 public class MainApplication {
     public static void main(String[] args) {
         org.springframework.boot.SpringApplication.run(MainApplication.class, args);

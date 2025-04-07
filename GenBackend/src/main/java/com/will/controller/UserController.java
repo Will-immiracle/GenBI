@@ -46,24 +46,24 @@ public class UserController {
     * */
     @PostMapping("/register")
     public Result<Long> register(@RequestBody UserRegisterDTO userRegisterDTO) {
-        if(userRegisterDTO == null) throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR);
+        if(userRegisterDTO == null) throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         String userAccount = userRegisterDTO.getUserAccount();
         String userPassword = userRegisterDTO.getUserPassword();
         String checkPassword = userRegisterDTO.getCheckPassword();
-        if(StringUtils.isEmpty(userAccount)) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR);
-        if(StringUtils.isEmpty(userPassword)) throw BusinessException.build(ResultCodeEnum.PASSWORD_ERROR);
-        if(StringUtils.isEmpty(checkPassword)) throw BusinessException.build(ResultCodeEnum.CHECK_PASSWORD_ERROR);
+        if(StringUtils.isEmpty(userAccount)) throw new BusinessException(ResultCodeEnum.USERNAME_ERROR);
+        if(StringUtils.isEmpty(userPassword)) throw new BusinessException(ResultCodeEnum.PASSWORD_ERROR);
+        if(StringUtils.isEmpty(checkPassword)) throw new BusinessException(ResultCodeEnum.CHECK_PASSWORD_ERROR);
         Long userId = userService.userRegister(userAccount, userPassword, checkPassword);
         return Result.ok(userId);
     }
 
     @PostMapping("/login")
     public Result login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
-        if(userLoginDTO == null) throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR);
+        if(userLoginDTO == null) throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         String userAccount = userLoginDTO.getUserAccount();
         String userPassword = userLoginDTO.getUserPassword();
-        if(StringUtils.isEmpty(userAccount)) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR);
-        if(StringUtils.isEmpty(userPassword)) throw BusinessException.build(ResultCodeEnum.PASSWORD_ERROR);
+        if(StringUtils.isEmpty(userAccount)) throw new BusinessException(ResultCodeEnum.USERNAME_ERROR);
+        if(StringUtils.isEmpty(userPassword)) throw new BusinessException(ResultCodeEnum.PASSWORD_ERROR);
         UserLoginVO user = userService.userLogin(userAccount, userPassword, request);
         return Result.ok(user);
     }
@@ -75,7 +75,7 @@ public class UserController {
     @PostMapping("/logout")
     public Result<Boolean> userLogout(HttpServletRequest request) {
         if (request == null) {
-            throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR,"未登录");
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR,"未登录");
         }
         boolean result = userService.userLogout(request);
         return Result.ok(result);
@@ -104,7 +104,7 @@ public class UserController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public Result<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
         if (userAddRequest == null) {
-            throw BusinessException.build(ResultCodeEnum.PARAMS_ERROR,"添加用户为空");
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR,"添加用户为空");
         }
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);

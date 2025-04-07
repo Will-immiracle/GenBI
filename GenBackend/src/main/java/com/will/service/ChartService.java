@@ -1,5 +1,8 @@
 package com.will.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.will.model.dto.chart.ChartQueryRequest;
 import com.will.model.pojo.Chart;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -9,5 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2025-04-04 22:13:24
 */
 public interface ChartService extends IService<Chart> {
+    QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest);
 
 }

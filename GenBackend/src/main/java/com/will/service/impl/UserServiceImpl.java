@@ -75,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             String encrypt = MD5Util.encrypt(userPassword);
             user.setUserPassword(encrypt);
             int insert = this.baseMapper.insert(user);
-            if(insert <= 0) throw BusinessException.build(ResultCodeEnum.DATABASE_ERROR);
+            if(insert <= 0) throw BusinessException.build(ResultCodeEnum.OPERATION_ERROR);
             return user.getId();
         }
     }
