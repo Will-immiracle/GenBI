@@ -49,7 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     * 3. 存入信息
     */
     @Override
-    public Long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public Long userRegister(String userName, String userAccount, String userPassword, String checkPassword) {
         // 1.检验输入参数
         if(StringUtils.isEmpty(userAccount)) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR);
         if(StringUtils.isEmpty(userPassword)) throw BusinessException.build(ResultCodeEnum.PASSWORD_ERROR);
@@ -71,6 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             queryWrapper.eq(User::getUserAccount,userAccount);
             if(this.baseMapper.selectCount(queryWrapper)>0) throw BusinessException.build(ResultCodeEnum.USERNAME_USED);
             User user = new User();
+            user.setUserName(userName);
             user.setUserAccount(userAccount);
             String encrypt = MD5Util.encrypt(userPassword);
             user.setUserPassword(encrypt);
@@ -99,6 +100,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(User::getUserAccount,userAccount);
         if(this.baseMapper.selectCount(queryWrapper) == 0) throw BusinessException.build(ResultCodeEnum.USERNAME_ERROR,"用户不存在");
+        queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(User::getUserAccount,userAccount);
         queryWrapper.eq(User::getUserPassword,encrypt);
         User user = this.baseMapper.selectOne(queryWrapper);
         if(user == null){

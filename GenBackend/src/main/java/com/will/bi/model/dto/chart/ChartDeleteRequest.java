@@ -13,6 +13,11 @@ import lombok.Data;
 public class ChartDeleteRequest implements Serializable {
 
     /**
+     * 图表名称
+     */
+    private String chartName;
+
+    /**
      * id
      */
     private Long id;

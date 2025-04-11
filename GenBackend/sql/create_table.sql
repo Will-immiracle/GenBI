@@ -1,5 +1,4 @@
 -- 库表设计
-
 -- 用户表
 create table if not exists user
 (
@@ -19,7 +18,8 @@ create table if not exists user
 create table if not exists chart
 (
     id           bigint auto_increment 									comment 'id' primary key,
-    user_id			 bigint 																not null comment '建表用户id'
+    user_id			 bigint 																not null comment '建表用户id',
+    chart_name	 varchar(128)  default 'default' 				null commit '图表名称',
     goal         text                                   null comment '分析目标',
     chart_data   text                                   null comment '图表数据',
     chart_type   varchar(128)                           null comment '图表类型',

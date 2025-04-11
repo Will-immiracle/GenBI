@@ -49,13 +49,15 @@ public class UserController {
     @PostMapping("/register")
     public Result<Long> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         if(userRegisterDTO == null) throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
+        String userName = userRegisterDTO.getUserName();
         String userAccount = userRegisterDTO.getUserAccount();
         String userPassword = userRegisterDTO.getUserPassword();
         String checkPassword = userRegisterDTO.getCheckPassword();
+        if(StringUtils.isEmpty(userName)) throw new BusinessException(ResultCodeEnum.USERNAME_ERROR,"用户名为空");
         if(StringUtils.isEmpty(userAccount)) throw new BusinessException(ResultCodeEnum.USERNAME_ERROR);
         if(StringUtils.isEmpty(userPassword)) throw new BusinessException(ResultCodeEnum.PASSWORD_ERROR);
         if(StringUtils.isEmpty(checkPassword)) throw new BusinessException(ResultCodeEnum.CHECK_PASSWORD_ERROR);
-        Long userId = userService.userRegister(userAccount, userPassword, checkPassword);
+        Long userId = userService.userRegister(userName,userAccount, userPassword, checkPassword);
         return Result.ok(userId);
     }
 

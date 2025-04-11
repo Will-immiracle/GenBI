@@ -16,6 +16,8 @@ public class Chart {
 
     private Long userId;
 
+    private String chartName;
+
     private String goal;
 
     private String chartData;

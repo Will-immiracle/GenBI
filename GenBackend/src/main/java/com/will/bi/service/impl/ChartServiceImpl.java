@@ -29,12 +29,14 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
         Long userId = chartQueryRequest.getUserId();
         Long id = chartQueryRequest.getId();
         String goal = chartQueryRequest.getGoal();
+        String chartName = chartQueryRequest.getChartName();
         String chartType = chartQueryRequest.getChartType();
         String sortOrder = chartQueryRequest.getSortOrder();
         String sortField = chartQueryRequest.getSortField();
         QueryWrapper<Chart> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(userId != null, "userId", userId);
         queryWrapper.eq(id != null, "id", id);
+        queryWrapper.like(StringUtils.isNotBlank(chartName), "chartName", chartName);
         queryWrapper.eq(StringUtils.isNotBlank(goal), "goal", goal);
         queryWrapper.eq(StringUtils.isNotBlank(chartType), "chartType", chartType);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),

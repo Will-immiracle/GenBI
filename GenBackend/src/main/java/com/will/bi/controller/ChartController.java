@@ -1,29 +1,41 @@
 package com.will.bi.controller;
 
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 
 import com.will.bi.annotation.AuthCheck;
 import com.will.bi.common.Result;
 import com.will.bi.common.ResultCodeEnum;
+import com.will.bi.constant.FileConstant;
 import com.will.bi.constant.UserConstant;
 import com.will.bi.exception.BusinessException;
 import com.will.bi.exception.utils.ThrowUtils;
+import com.will.bi.manager.OssManager;
 import com.will.bi.model.dto.chart.ChartAddRequest;
 import com.will.bi.model.dto.chart.ChartEditRequest;
 import com.will.bi.model.dto.chart.ChartQueryRequest;
 import com.will.bi.model.dto.chart.ChartUpdateRequest;
 import com.will.bi.model.dto.chart.ChartDeleteRequest;
+import com.will.bi.model.dto.chart.GenChatByAiRequest;
+import com.will.bi.model.enums.FileUploadBizEnum;
 import com.will.bi.model.pojo.Chart;
 import com.will.bi.model.pojo.User;
 import com.will.bi.service.ChartService;
 import com.will.bi.service.UserService;
+import com.will.bi.utils.ExcelUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * @program: GenBI
@@ -41,6 +53,69 @@ public class ChartController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OssManager ossManager;
+
+    /**
+     * ai分析生成图表
+     *
+     * @param multipartFile 数据
+     * @param genChatByAiRequest 请求参数
+     * @param request 请求对话
+     * @return
+     *
+     * 1. 校验参数
+     * 2. 数据预处理
+     * 3. 调用AI接口
+     * 4. 封装返回结果
+     */
+    @PostMapping("/gen")
+    public Result<String> genChatByAi(@RequestPart("file") MultipartFile multipartFile,
+                                      GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) {
+        // 1. 参数校验
+        String chatType = genChatByAiRequest.getChatType();
+        String chartName = genChatByAiRequest.getChartName();
+        String goal = genChatByAiRequest.getGoal();
+        ThrowUtils.throwIf(StringUtils.isBlank(goal),ResultCodeEnum.PARAMS_ERROR, "请输入分析目标");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 80,ResultCodeEnum.PARAMS_ERROR, "名称过长");
+        // 2. 数据预处理
+        StringBuilder userInput = new StringBuilder();
+        userInput.append("你的职责是数据分析师，接下来我会给你我的分析目标和原始数据，请告诉我分析结论。").append("\n");
+        userInput.append("分析目标:").append(goal).append("\n");
+        String csv = ExcelUtils.excelToCsv(multipartFile);
+        userInput.append("数据:").append(csv).append("\n");
+        return Result.ok(userInput.toString());
+
+
+        User loginUser = userService.getLoginUser(request);
+        // 文件目录：根据业务、用户来划分
+        String uuid = RandomStringUtils.randomAlphanumeric(8);
+        String filename = uuid + "-" + multipartFile.getOriginalFilename();
+        String filepath = String.format("/%s/%s/%s", fileUploadBizEnum.getValue(), loginUser.getId(), filename);
+        File file = null;
+        try {
+            // 上传文件
+            file = File.createTempFile(filepath, null);
+            multipartFile.transferTo(file);
+            ossManager.putObject(filepath, file);
+            // 返回可访问地址
+            return Result.ok(FileConstant.COS_HOST + filepath);
+        } catch (Exception e) {
+            log.error("file upload error, filepath = " + filepath, e);
+            throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "上传失败");
+        } finally {
+            if (file != null) {
+                // 删除临时文件
+                boolean delete = file.delete();
+                if (!delete) {
+                    log.error("file delete error, filepath = {}", filepath);
+                }
+            }
+        }
+    }
+
+    
 
     /**
      * 创建图标信息表

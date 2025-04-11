@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.will.bi.model.pojo.Chart">
             <id property="id" column="id" />
             <result property="userId" column="userId" />
+            <result property="chartName" column="chartName" />
             <result property="goal" column="goal" />
             <result property="chartData" column="chartData" />
             <result property="chartType" column="chartType" />
@@ -18,7 +19,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,userId,goal,chartData,chartType,genChart,genResult,
+        id,userId,chartName,goal,chartData,chartType,genChart,genResult,
         createTime,updateTime,isDelete
     </sql>
 </mapper>
