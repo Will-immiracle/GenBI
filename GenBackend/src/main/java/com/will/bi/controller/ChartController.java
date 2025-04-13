@@ -12,6 +12,7 @@ import com.will.bi.constant.FileConstant;
 import com.will.bi.constant.UserConstant;
 import com.will.bi.exception.BusinessException;
 import com.will.bi.exception.utils.ThrowUtils;
+import com.will.bi.manager.AiManager;
 import com.will.bi.manager.OssManager;
 import com.will.bi.model.dto.chart.ChartAddRequest;
 import com.will.bi.model.dto.chart.ChartEditRequest;
@@ -22,9 +23,11 @@ import com.will.bi.model.dto.chart.GenChatByAiRequest;
 import com.will.bi.model.enums.FileUploadBizEnum;
 import com.will.bi.model.pojo.Chart;
 import com.will.bi.model.pojo.User;
+import com.will.bi.model.vo.bi.BiResponse;
 import com.will.bi.service.ChartService;
 import com.will.bi.service.UserService;
 import com.will.bi.utils.ExcelUtils;
+import com.will.bi.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -55,12 +58,11 @@ public class ChartController {
     private UserService userService;
 
     @Autowired
-    private OssManager ossManager;
+    private AiManager aiManager;
 
     /**
      * ai分析生成图表
      *
-     * @param multipartFile 数据
      * @param genChatByAiRequest 请求参数
      * @param request 请求对话
      * @return
@@ -71,8 +73,8 @@ public class ChartController {
      * 4. 封装返回结果
      */
     @PostMapping("/gen")
-    public Result<String> genChatByAi(@RequestPart("file") MultipartFile multipartFile,
-                                      GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) {
+    public Result<BiResponse> genChatByAi(@RequestPart("file") MultipartFile multipartFile,
+            GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) {
         // 1. 参数校验
         String chatType = genChatByAiRequest.getChatType();
         String chartName = genChatByAiRequest.getChartName();
@@ -81,38 +83,36 @@ public class ChartController {
         ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 80,ResultCodeEnum.PARAMS_ERROR, "名称过长");
         // 2. 数据预处理
         StringBuilder userInput = new StringBuilder();
-        userInput.append("你的职责是数据分析师，接下来我会给你我的分析目标和原始数据，请告诉我分析结论。").append("\n");
         userInput.append("分析目标:").append(goal).append("\n");
+        if(StringUtils.isNotBlank(chartName)){
+            userInput.append("请使用").append(chartName).append("展示数据。").append("\n");
+        }
         String csv = ExcelUtils.excelToCsv(multipartFile);
         userInput.append("数据:").append(csv).append("\n");
-        return Result.ok(userInput.toString());
-
-
-        User loginUser = userService.getLoginUser(request);
-        // 文件目录：根据业务、用户来划分
-        String uuid = RandomStringUtils.randomAlphanumeric(8);
-        String filename = uuid + "-" + multipartFile.getOriginalFilename();
-        String filepath = String.format("/%s/%s/%s", fileUploadBizEnum.getValue(), loginUser.getId(), filename);
-        File file = null;
-        try {
-            // 上传文件
-            file = File.createTempFile(filepath, null);
-            multipartFile.transferTo(file);
-            ossManager.putObject(filepath, file);
-            // 返回可访问地址
-            return Result.ok(FileConstant.COS_HOST + filepath);
-        } catch (Exception e) {
-            log.error("file upload error, filepath = " + filepath, e);
-            throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "上传失败");
-        } finally {
-            if (file != null) {
-                // 删除临时文件
-                boolean delete = file.delete();
-                if (!delete) {
-                    log.error("file delete error, filepath = {}", filepath);
-                }
-            }
-        }
+        String json = aiManager.doChat(userInput.toString());
+        JsonUtils jsonUtils = new JsonUtils();
+        String content = jsonUtils.getContent(json);
+        // 3. 格式化返回数据
+        String[] split = content.split("\\$\\$\\$");
+        if(split.length < 3) throw new BusinessException(ResultCodeEnum.PARAMS_ERROR, "AI生成错误");
+        String genChart = split[1];
+        String genConclusion = split[2];
+        // 4. 持久化到数据库
+        Chart chart = new Chart();
+        chart.setChartData(csv);
+        chart.setChartType(chatType);
+        chart.setChartName(chartName);
+        chart.setGoal(goal);
+        chart.setGenChart(genChart);
+        chart.setGenResult(genConclusion);
+        chart.setUserId(userService.getLoginUser(request).getId());
+        boolean save = chartService.save(chart);
+        ThrowUtils.throwIf(!save, ResultCodeEnum.OPERATION_ERROR,"图表信息保存失败");
+        BiResponse biResponse = new BiResponse();
+        biResponse.setGenChart(genChart);
+        biResponse.setGenConclusion(genConclusion);
+        biResponse.setChartId(chart.getId());
+        return Result.ok(biResponse);
     }
 
     

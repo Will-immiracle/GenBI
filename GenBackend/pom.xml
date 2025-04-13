@@ -83,6 +83,13 @@
             <version>4.5.0</version>
         </dependency>
 
+        <!-- springDoc增强工具 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- 文件上传 -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
@@ -127,6 +134,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- json动态解析 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
         </dependency>
 
     </dependencies>

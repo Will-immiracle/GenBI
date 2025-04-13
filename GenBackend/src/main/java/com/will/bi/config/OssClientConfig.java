@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  **/
 
 @Configuration
-@ConfigurationProperties(prefix = "ali-cloud.services.oss")
+@ConfigurationProperties(prefix = "aliyun.services.oss")
 @Data
 public class OssClientConfig {
 
