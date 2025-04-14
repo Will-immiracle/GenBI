@@ -224,30 +224,5 @@ src/main/java/com/minispring/
 ```
 ````
 
-## 环境要求
-- JDK 17+
-- Maven 3.8.1+
-- IDE（推荐IntelliJ IDEA）
-- Git
-
-## 快速开始
-
-### 1. 获取代码
-```bash
-# 克隆项目
-git clone https://github.com/Will-immiracle/GenBI.git
-
-# 进入项目目录
-cd GenBI
-```
-
-### 2. 编译运行
-```bash
-# 编译项目
-mvn clean install
-
-# 运行测试
-mvn test
-```
 ### 开源协议
 本项目采用 MIT 协议开源，详见 [LICENSE](LICENSE) 文件。 
