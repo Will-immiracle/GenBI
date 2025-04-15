@@ -38,7 +38,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @program: GenBI
@@ -74,18 +77,28 @@ public class ChartController {
      */
     @PostMapping("/gen")
     public Result<BiResponse> genChatByAi(@RequestPart("file") MultipartFile multipartFile,
-            GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) {
+            GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) throws IOException {
         // 1. 参数校验
-        String chatType = genChatByAiRequest.getChatType();
+        String chartType = genChatByAiRequest.getChartType();
         String chartName = genChatByAiRequest.getChartName();
         String goal = genChatByAiRequest.getGoal();
         ThrowUtils.throwIf(StringUtils.isBlank(goal),ResultCodeEnum.PARAMS_ERROR, "请输入分析目标");
         ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 80,ResultCodeEnum.PARAMS_ERROR, "名称过长");
+        // 文件大小不超过 10M
+        Long MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024L;
+        long size = multipartFile.getSize();
+        ThrowUtils.throwIf(size > MAX_FILE_SIZE, ResultCodeEnum.PARAMS_ERROR, "文件超出10M");
+        // 文件格式规定为.xlsx
+        String originalFilename = multipartFile.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(originalFilename);
+//        List<String> validFileSuffixList = Arrays.asList("xlsx", "xls");
+        List<String> validFileSuffixList = Arrays.asList("xlsx");
+        ThrowUtils.throwIf(!validFileSuffixList.contains(suffix),ResultCodeEnum.PARAMS_ERROR, "文件后缀非法");
         // 2. 数据预处理
         StringBuilder userInput = new StringBuilder();
-        userInput.append("分析目标:").append(goal).append("\n");
-        if(StringUtils.isNotBlank(chartName)){
-            userInput.append("请使用").append(chartName).append("展示数据。").append("\n");
+        userInput.append("分析目标:").append(goal).append(", ");
+        if(StringUtils.isNotBlank(chartType)){
+            userInput.append("请使用").append(chartType).append("进行数据展示.").append("\n");
         }
         String csv = ExcelUtils.excelToCsv(multipartFile);
         userInput.append("数据:").append(csv).append("\n");
@@ -99,14 +112,14 @@ public class ChartController {
         String genConclusion = split[2];
         // 4. 持久化到数据库
         Chart chart = new Chart();
-        chart.setChartData(csv);
-        chart.setChartType(chatType);
+        chart.setChartType(chartType);
         chart.setChartName(chartName);
         chart.setGoal(goal);
         chart.setGenChart(genChart);
         chart.setGenResult(genConclusion);
         chart.setUserId(userService.getLoginUser(request).getId());
         boolean save = chartService.save(chart);
+        chartService.createDataTable(multipartFile,chart.getId());
         ThrowUtils.throwIf(!save, ResultCodeEnum.OPERATION_ERROR,"图表信息保存失败");
         BiResponse biResponse = new BiResponse();
         biResponse.setGenChart(genChart);
@@ -233,23 +246,22 @@ public class ChartController {
     /**
      * 分页获取当前用户创建的资源列表
      *
-     * @param ChartQueryRequest
      * @param request
      */
     @PostMapping("/my/list/page")
-    public Result<Page<Chart>> listMyChartByPage(@RequestBody ChartQueryRequest ChartQueryRequest,
+    public Result<Page<Chart>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
                                                          HttpServletRequest request) {
-        if (ChartQueryRequest == null) {
+        if (chartQueryRequest == null) {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
-        ChartQueryRequest.setUserId(loginUser.getId());
-        long current = ChartQueryRequest.getCurrent();
-        long size = ChartQueryRequest.getPageSize();
+        chartQueryRequest.setUserId(loginUser.getId());
+        long current = chartQueryRequest.getCurrent();
+        long size = chartQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ResultCodeEnum.PARAMS_ERROR);
         Page<Chart> chartPage = chartService.page(new Page<>(current, size),
-                chartService.getQueryWrapper(ChartQueryRequest));
+                chartService.getQueryWrapper(chartQueryRequest));
         return Result.ok(chartPage);
     }
 

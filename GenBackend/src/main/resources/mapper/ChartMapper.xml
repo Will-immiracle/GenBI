@@ -19,7 +19,18 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,userId,chartName,goal,chartData,chartType,genChart,genResult,
-        createTime,updateTime,isDelete
+        id,updateTime,goal,chartData,chartType,genChart,
+        genResult,createTime,isDelete,userId,chartName
     </sql>
+
+    <update id="createDataTable" >
+        ${createSql}
+    </update>
+
+    <update id="insertChartData">
+        ${insertSql}
+    </update>
+
+
+
 </mapper>

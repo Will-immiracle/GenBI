@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @program: GenBI
@@ -40,6 +41,7 @@ public class ChartQueryRequest extends PageRequest implements Serializable {
     * 图表类型
     */
     private String chartType;
+
 
     private static final long serialVersionUID = 1L;
 }

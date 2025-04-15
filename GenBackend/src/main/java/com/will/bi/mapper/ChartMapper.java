@@ -2,6 +2,9 @@ package com.will.bi.mapper;
 
 import com.will.bi.model.pojo.Chart;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author zhangzan
@@ -11,6 +14,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface ChartMapper extends BaseMapper<Chart> {
 
+    Boolean createDataTable(@Param("createSql") String createSql);
+
+    Boolean insertChartData(@Param("insertSql") String insertSql);
 }
 
 

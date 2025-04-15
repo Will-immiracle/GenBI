@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.will.bi.model.dto.chart.ChartQueryRequest;
 import com.will.bi.model.pojo.Chart;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
 * @author zhangzan
@@ -13,4 +17,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ChartService extends IService<Chart> {
     QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest);
 
+    Boolean createDataTable(MultipartFile multipartFile, Long chartId) throws IOException;
+    
 }

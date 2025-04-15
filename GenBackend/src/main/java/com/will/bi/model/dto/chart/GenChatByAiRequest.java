@@ -27,7 +27,7 @@ public class GenChatByAiRequest implements Serializable {
     /**
      * 图表类型
      */
-    private String chatType;
+    private String chartType;
 
     private static final long serialVersionUID = 1L;
 }
