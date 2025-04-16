@@ -11,7 +11,7 @@
 - [x] 查看历史**所有**可视化图表、结论。附带**关键词**查询功能。
 - [ ]  原始数据存入服务器数据库并**建表**。用户可以查看、编辑原始数据。
 ### 流程图展示
-
+![image](https://github.com/Will-immiracle/GenBI/blob/main/images/process.png)
 ### 扩展优化：
 - 分库分表
   - apache poi库详见： https://blog.51cto.com/u_16175466/12885984
