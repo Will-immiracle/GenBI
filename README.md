@@ -23,7 +23,9 @@
 - 系统异步化
 
 ### 扩展流程图
-
+<div align=center>
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/异步流程图.drawio.svg" width="430" height="270">
+</div>
 ---
 ## 模块解析
 
