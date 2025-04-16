@@ -10,9 +10,9 @@
 - [x] 用户输入分析需求、原始数据。得到**数据图表、分析结论**。
 - [x] 查看历史**所有**可视化图表、结论。附带**关键词**查询功能。
 - [ ]  原始数据存入服务器数据库并**建表**。用户可以查看、编辑原始数据。
-### 流程图展示
+### 流程图
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/流程图.drawio.svg" width="360" height="210">/>
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/流程图.drawio.svg" width="390" height="235">/>
 </div>
 ### 扩展优化：
 - 分库分表
