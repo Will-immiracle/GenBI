@@ -12,7 +12,7 @@
 - [ ]  原始数据存入服务器数据库并**建表**。用户可以查看、编辑原始数据。
 ### 流程图
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/流程图.drawio.svg" width="400" height="245">
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/流程图.drawio.svg" width="430" height="270">
 </div>
   
 ### 扩展优化：
@@ -21,6 +21,8 @@
 - 限流服务
   - redisson令牌桶限流
 - 系统异步化
+
+### 扩展流程图
 
 ---
 ## 模块解析
