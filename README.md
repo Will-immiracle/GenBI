@@ -26,6 +26,7 @@
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/异步流程图1.drawio.svg" width="530" height="460">
 </div>
+  
 ---
   
 ## 模块解析
