@@ -15,6 +15,7 @@
   - apache poi库详见： https://blog.51cto.com/u_16175466/12885984
 - 限流服务
   - redisson令牌桶限流
+- 系统异步化
 
 ---
 ## 模块解析
