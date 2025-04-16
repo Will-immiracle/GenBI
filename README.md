@@ -67,6 +67,22 @@
 4. 用户可以查询任务的执行状态，或在执行结束时得到通知（邮件、提示音、短信），从而优化体验 
 5. 如果任务非常复杂，则子任务完成时，即刻更新状态
 
+**线程池的实现**
+在Java中，可以使用JUC并发包中的ThreadPoolExecutor，来实现灵活的自定义线程池。  
+线程池参数：
+```
+public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue<Runnable> workQueue) {
+```
+怎么确定线程池参数呢？结合实际情况（实际业务场景和系统资源）来测试调整，不断优化。  
+
+回归到我们的业务，首先考虑系统最脆弱的环节（瓶颈）在哪里？  
+腾讯混元模型默认在文本生成场景下允许5个线程去执行。
+
+
   
 
 
