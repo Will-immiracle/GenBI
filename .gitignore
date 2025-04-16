@@ -2,3 +2,4 @@ GenBackend/src/main/resources/application.yaml
 GenBackend/src/main/resources/application.yaml
 GenBackend/target/classes/application.yaml
 /GenBackend/src/main/resources
+*.yaml
