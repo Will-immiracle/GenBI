@@ -112,7 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         BeanUtils.copyProperties(user, userLoginVO);
         // 配置token信息
         JwtHelper jwtHelper = new JwtHelper();
-        jwtHelper.setTokenExpiration(1000*60*60*24*7);
+        jwtHelper.setTokenExpiration(1000 * 60 * 60 * 24 * 7L);
         jwtHelper.setTokenSignKey("GenBi");
         userLoginVO.setToken(jwtHelper.createToken(user.getId()));
         // 记录用户登录态

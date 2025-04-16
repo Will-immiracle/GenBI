@@ -27,12 +27,6 @@ public class OpenAiApi {
 
     private String endpoint;
 
-    private String apiKey;
-
-    private String baseUrl;
-
-    private String model;
-
     @Bean
     public HunyuanClient hunyuanClient(){
         Credential cred = new Credential(secretId, secretKey);

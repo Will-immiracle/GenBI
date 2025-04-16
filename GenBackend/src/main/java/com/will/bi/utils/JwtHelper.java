@@ -13,17 +13,15 @@ import java.util.Date;
 @ConfigurationProperties(prefix = "jwt.token")
 public class JwtHelper {
 
-    private  long tokenExpiration; //有效时间,单位毫秒 1000毫秒 == 1秒
+    private  Long tokenExpiration; //有效时间,单位毫秒 1000毫秒 == 1秒
     private  String tokenSignKey;  //当前程序签名秘钥
 
     //生成token字符串
     public  String createToken(Long userId) {
-        System.out.println("tokenExpiration = " + tokenExpiration);
-        System.out.println("tokenSignKey = " + tokenSignKey);
         String token = Jwts.builder()
 
                 .setSubject("WILL-IN-MIRACLE")
-                .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration*1000*60)) //单位分钟
+                .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration * 1000 * 60)) //单位分钟
                 .claim("userId", userId)
                 .signWith(SignatureAlgorithm.HS512, tokenSignKey)
                 .compressWith(CompressionCodecs.GZIP)

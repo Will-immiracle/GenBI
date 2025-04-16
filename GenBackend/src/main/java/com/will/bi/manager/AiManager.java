@@ -26,6 +26,8 @@ public class AiManager {
     @Autowired
     private HunyuanClient hunyuanclient;
 
+    private String model = "hunyuan-vision";
+
     final String prompt = "你的职责是数据分析师和前端分析专家，接下来我会按照以下固定格式给你提供内容:\n"+
             "分析需求: \n"+
             "{数据分析的需求或者目标,以及可能提到json代码生成图表的类型}\n"+
@@ -39,7 +41,7 @@ public class AiManager {
 
     public String doChat(String message) {
         ChatCompletionsRequest req = new ChatCompletionsRequest();
-        req.setModel("hunyuan-vision");
+        req.setModel(model);
 
         Message[] messages1 = new Message[1];
         Message message1 = new Message();
