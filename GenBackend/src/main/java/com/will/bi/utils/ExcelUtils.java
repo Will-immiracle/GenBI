@@ -37,18 +37,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ExcelUtils {
 
-    public static String excelToCsv(MultipartFile multipartFile){
+    public static String excelToCsv(MultipartFile multipartFile) throws IOException {
         List<Map<Integer, String>> list;
-        try {
-            list = FastExcel.read(multipartFile.getInputStream())
-                    .excelType(ExcelTypeEnum.XLSX)
-                    .sheet()
-                    .headRowNumber(0)
-                    .doReadSync();
-        } catch (IOException e) {
-            log.error("excelToCsv error",e);
-            throw new RuntimeException("excelToCsv error");
-        }
+        list = FastExcel.read(multipartFile.getInputStream())
+                .excelType(ExcelTypeEnum.XLSX)
+                .sheet()
+                .headRowNumber(0)
+                .doReadSync();
         if(CollUtil.isEmpty(list)){
             return "";
         }
@@ -68,10 +63,9 @@ public class ExcelUtils {
     }
 
     public static List<String[]> excelToList(MultipartFile multipartFile) throws IOException {
+        InputStream inputStream = multipartFile.getInputStream();
         List<String[]> list = new ArrayList<>();
         Workbook sheets;
-        InputStream inputStream;
-        inputStream = multipartFile.getInputStream();
         sheets = new XSSFWorkbook(inputStream);
         Sheet sheet = sheets.getSheetAt(0);
         Row header = sheet.getRow(0);

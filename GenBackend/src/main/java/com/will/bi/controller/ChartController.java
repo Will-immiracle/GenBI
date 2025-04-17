@@ -12,6 +12,7 @@ import com.will.bi.constant.FileConstant;
 import com.will.bi.constant.UserConstant;
 import com.will.bi.exception.BusinessException;
 import com.will.bi.exception.utils.ThrowUtils;
+import com.will.bi.exception.utils.UpdateChartFailed;
 import com.will.bi.manager.AiManager;
 import com.will.bi.manager.OssManager;
 import com.will.bi.model.dto.chart.ChartAddRequest;
@@ -20,6 +21,7 @@ import com.will.bi.model.dto.chart.ChartQueryRequest;
 import com.will.bi.model.dto.chart.ChartUpdateRequest;
 import com.will.bi.model.dto.chart.ChartDeleteRequest;
 import com.will.bi.model.dto.chart.GenChatByAiRequest;
+import com.will.bi.model.enums.ChartStatusEnum;
 import com.will.bi.model.enums.FileUploadBizEnum;
 import com.will.bi.model.pojo.Chart;
 import com.will.bi.model.pojo.User;
@@ -39,9 +41,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @program: GenBI
@@ -63,8 +68,11 @@ public class ChartController {
     @Autowired
     private AiManager aiManager;
 
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
+
     /**
-     * ai分析生成图表
+     * ai分析生成图表 (同步)
      *
      * @param genChatByAiRequest 请求参数
      * @param request 请求对话
@@ -75,9 +83,10 @@ public class ChartController {
      * 3. 调用AI接口
      * 4. 封装返回结果
      */
+
     @PostMapping("/gen")
     public Result<BiResponse> genChatByAi(@RequestPart("file") MultipartFile multipartFile,
-            GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) throws IOException {
+                                          GenChatByAiRequest genChatByAiRequest, HttpServletRequest request){
         // 1. 参数校验
         String chartType = genChatByAiRequest.getChartType();
         String chartName = genChatByAiRequest.getChartName();
@@ -91,8 +100,7 @@ public class ChartController {
         // 文件格式规定为.xlsx
         String originalFilename = multipartFile.getOriginalFilename();
         String suffix = FileUtil.getSuffix(originalFilename);
-//        List<String> validFileSuffixList = Arrays.asList("xlsx", "xls");
-        List<String> validFileSuffixList = Arrays.asList("xlsx");
+        List<String> validFileSuffixList = Arrays.asList("xlsx", "xls");
         ThrowUtils.throwIf(!validFileSuffixList.contains(suffix),ResultCodeEnum.PARAMS_ERROR, "文件后缀非法");
         // 2. 数据预处理
         StringBuilder userInput = new StringBuilder();
@@ -100,7 +108,12 @@ public class ChartController {
         if(StringUtils.isNotBlank(chartType)){
             userInput.append("请使用").append(chartType).append("进行数据展示.").append("\n");
         }
-        String csv = ExcelUtils.excelToCsv(multipartFile);
+        String csv = null;
+        try {
+            csv = ExcelUtils.excelToCsv(multipartFile);
+        } catch (IOException e) {
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR, "文件转换错误");
+        }
         userInput.append("数据:").append(csv).append("\n");
         String json = aiManager.doChat(userInput.toString());
         JsonUtils jsonUtils = new JsonUtils();
@@ -119,12 +132,109 @@ public class ChartController {
         chart.setGenResult(genConclusion);
         chart.setUserId(userService.getLoginUser(request).getId());
         boolean save = chartService.save(chart);
-        chartService.createDataTable(multipartFile,chart.getId());
-        ThrowUtils.throwIf(!save, ResultCodeEnum.OPERATION_ERROR,"图表信息保存失败");
+        try {
+            chartService.createDataTable(multipartFile,chart.getId());
+        } catch (IOException e) {
+            throw new BusinessException(ResultCodeEnum.OPERATION_ERROR,"表数据保存失败");
+        }
+        ThrowUtils.throwIf(!save, ResultCodeEnum.OPERATION_ERROR,"表信息保存失败");
         BiResponse biResponse = new BiResponse();
         biResponse.setGenChart(genChart);
         biResponse.setGenConclusion(genConclusion);
         biResponse.setChartId(chart.getId());
+        return Result.ok(biResponse);
+    }
+
+    /**
+     * ai分析生成图表 (异步)
+     *
+     * @param genChatByAiRequest 请求参数
+     * @param request 请求对话
+     * @return
+     *
+     * 1. 校验参数
+     * 2. 数据预处理
+     * 3. 调用AI接口
+     * 4. 封装返回结果
+     */
+    @PostMapping("/gen/async")
+    public Result<BiResponse> genChatByAiAsync(@RequestPart("file") MultipartFile multipartFile,
+            GenChatByAiRequest genChatByAiRequest, HttpServletRequest request){
+        // 1. 参数校验
+        String chartType = genChatByAiRequest.getChartType();
+        String chartName = genChatByAiRequest.getChartName();
+        String goal = genChatByAiRequest.getGoal();
+        ThrowUtils.throwIf(StringUtils.isBlank(goal),ResultCodeEnum.PARAMS_ERROR, "请输入分析目标");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 80,ResultCodeEnum.PARAMS_ERROR, "名称过长");
+        // 文件大小不超过 10M
+        Long MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024L;
+        long size = multipartFile.getSize();
+        ThrowUtils.throwIf(size > MAX_FILE_SIZE, ResultCodeEnum.PARAMS_ERROR, "文件超出10M");
+        // 文件格式规定为.xlsx
+        String originalFilename = multipartFile.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(originalFilename);
+        List<String> validFileSuffixList = Arrays.asList("xlsx", "xls");
+        ThrowUtils.throwIf(!validFileSuffixList.contains(suffix),ResultCodeEnum.PARAMS_ERROR, "文件后缀非法");
+        // 3. 提交任务，持久化到数据库
+        Chart chart = new Chart();
+        chart.setStatus(ChartStatusEnum.WAITING.getValue());
+        chart.setChartType(chartType);
+        chart.setChartName(chartName);
+        chart.setGoal(goal);
+        chart.setUserId(userService.getLoginUser(request).getId());
+        chartService.save(chart);
+        // 2. 数据预处理
+        StringBuilder userInput = new StringBuilder();
+        userInput.append("分析目标:").append(goal).append(", ");
+        if(StringUtils.isNotBlank(chartType)){
+            userInput.append("请使用").append(chartType).append("进行数据展示.").append("\n");
+        }
+        String csv = "";
+        try(InputStream inputStream = multipartFile.getInputStream()) {
+            chartService.createDataTable(multipartFile, chart.getId());
+            csv = ExcelUtils.excelToCsv(multipartFile);
+        } catch (IOException e) {
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR, "数据创建表错误");
+        }
+        userInput.append("数据:").append(csv).append("\n");
+        // 4. 调用业务，更新执行状态
+        CompletableFuture.runAsync(() -> {
+            // 4.0 更新执行状态
+            Chart updateChart = new Chart();
+            updateChart.setId(chart.getId());
+            updateChart.setStatus(ChartStatusEnum.EXECUTING.getValue());
+            chartService.updateById(updateChart);
+            // 4.1 调用AiManager处理业务
+            String json = aiManager.doChat(userInput.toString());
+            JsonUtils jsonUtils = new JsonUtils();
+            String content = jsonUtils.getContent(json);
+            // 4.2. 格式化返回数据
+            String[] split = content.split("\\$\\$\\$");
+            if(split.length < 3){
+                // 4.3.1 更新失败状态
+                String errorInfo = "AI生成错误";
+                UpdateChartFailed.updateChartFailed(chart.getId(), errorInfo, chartService);
+                throw new BusinessException(ResultCodeEnum.PARAMS_ERROR, errorInfo);
+            }
+            String genChart = split[1];
+            String genConclusion = split[2];
+            // 4.3.2 更新成功状态
+            Chart updateSuccessChart = new Chart();
+            updateSuccessChart.setId(chart.getId());
+            updateSuccessChart.setStatus(ChartStatusEnum.SUCCESS.getValue());
+            updateSuccessChart.setGenChart(genChart);
+            updateSuccessChart.setGenResult(genConclusion);
+
+            // 4.3.3 处理错误
+            boolean saveChart = chartService.updateById(updateSuccessChart);
+            ThrowUtils.throwIf(!saveChart, ResultCodeEnum.OPERATION_ERROR, "信息提交错误");
+        }, threadPoolExecutor);
+
+        Chart successChart = chartService.getById(chart.getId());
+        BiResponse biResponse = new BiResponse();
+        biResponse.setGenChart(successChart.getGenChart());
+        biResponse.setGenConclusion(successChart.getGenResult());
+        biResponse.setChartId(successChart.getId());
         return Result.ok(biResponse);
     }
 

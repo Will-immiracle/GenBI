@@ -24,13 +24,17 @@ public class Chart {
 
     private String chartType;
 
-    private String genChart;
-
-    private String genResult;
-
     private Date createTime;
 
     private Date updateTime;
+
+    private Integer status;
+
+    private String info;
+
+    private String genChart;
+
+    private String genResult;
 
     @TableLogic
     private Integer isDelete;

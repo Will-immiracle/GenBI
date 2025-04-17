@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,47 +59,51 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
     }
 
     @Override
-    public Boolean createDataTable(MultipartFile multipartFile, Long chartId) throws IOException {
-
-        List<String[]> maps;
-        maps = ExcelUtils.excelToList(multipartFile);
-        String colum_content = "";
-        for(int i = 0; i < maps.size(); i++){
-            String[] map = maps.get(i);
-            colum_content += map[0];
-            colum_content += " ";
-            colum_content += map[1];
-            if(i == maps.size() - 1){
-                colum_content += ")";
-                break;
-            }
-            colum_content += ",";
-        }
-        String createSql = "CREATE TABLE IF NOT EXISTS chart_"+chartId+" (";
-        createSql += colum_content;
-        chartMapper.createDataTable(createSql);
-
-        List<Map<Integer, String>> data = ExcelUtils.insertExcel(multipartFile);
-         String insertData = "";
-        for(int i = 1; i < data.size();i++){
-            String insertSql = "INSERT INTO chart_"+chartId+" VALUES (";
-            LinkedHashMap<Integer, String> integerStringMap = (LinkedHashMap)data.get(i);
-            for(int j = 0; j < integerStringMap.size(); j++){
-                insertSql += "'" + integerStringMap.get(j) + "'";
-                if(j == integerStringMap.size() - 1){
-                    insertSql += ")";
+    public Boolean createDataTable(MultipartFile multipartFile, Long chartId){
+        try{
+            List<String[]> maps;
+            maps = ExcelUtils.excelToList(multipartFile);
+            String colum_content = "";
+            for(int i = 0; i < maps.size(); i++){
+                String[] map = maps.get(i);
+                colum_content += map[0];
+                colum_content += " ";
+                colum_content += map[1];
+                if(i == maps.size() - 1){
+                    colum_content += ")";
                     break;
                 }
-                insertSql += ",";
+                colum_content += ",";
             }
-            insertData += insertSql;
-            if(i == data.size()-1){
-                break;
-            }
-            insertData += ";\n";
-        }
-        chartMapper.insertChartData(insertData);
+            String createSql = "CREATE TABLE IF NOT EXISTS chart_"+chartId+" (";
+            createSql += colum_content;
+            chartMapper.createDataTable(createSql);
 
+            List<Map<Integer, String>> data = ExcelUtils.insertExcel(multipartFile);
+            String insertData = "";
+            for(int i = 1; i < data.size();i++){
+                String insertSql = "INSERT INTO chart_"+chartId+" VALUES (";
+                LinkedHashMap<Integer, String> integerStringMap = (LinkedHashMap)data.get(i);
+                for(int j = 0; j < integerStringMap.size(); j++){
+                    insertSql += "'" + integerStringMap.get(j) + "'";
+                    if(j == integerStringMap.size() - 1){
+                        insertSql += ")";
+                        break;
+                    }
+                    insertSql += ",";
+                }
+                insertData += insertSql;
+                if(i == data.size()-1){
+                    break;
+                }
+                insertData += ";\n";
+            }
+            chartMapper.insertChartData(insertData);
+
+        }catch (IOException e){
+            log.error("createDataTable IOException", e);
+            throw new BusinessException(ResultCodeEnum.OPERATION_ERROR, "createDataTable IOException");
+        }
         return true;
     }
 

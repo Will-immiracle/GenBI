@@ -14,13 +14,15 @@
             <result property="genChart" column="genChart" />
             <result property="genResult" column="genResult" />
             <result property="createTime" column="createTime" />
+            <result property="status" column="status" />
+            <result property="info" column="info" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,updateTime,goal,chartData,chartType,genChart,
-        genResult,createTime,isDelete,userId,chartName
+        genResult,createTime,isDelete,userId,chartName,status,info
     </sql>
 
     <update id="createDataTable" >
