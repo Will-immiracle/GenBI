@@ -21,6 +21,7 @@
 - 限流服务
   - redisson令牌桶限流
 - 系统异步化
+- 消息持久化
 
 ### 扩展流程图
 <div align=center>
