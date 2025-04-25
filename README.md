@@ -74,7 +74,7 @@ BEGIN
 END$$;
 
 delimiter ;  -- 界定符复原为默认的分号
-CALL BatchInsert(1, 5000000);  -- 调用存储过程
+CALL BatchInsert(1, 3000000);  -- 调用存储过程
 
 ```
 1.2 测试查询性能（300万条） 
@@ -115,10 +115,21 @@ mysql> show global variables like '%quer%';
 ```
 测试查询性能：  
 
+```sql
+# 获取一条id为1860000的数据
+SELECT * 
+FROM chart_test
+WHERE user_id=1860000;
+```
 
 2.2. 测试结果  
+插入结果：  
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="430">
+</div>
+查询结果：  
+<div align=center>
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test2.png" width="800" height="430">
 </div>
 
 **优化后单表的插入、查询性能**
