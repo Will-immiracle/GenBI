@@ -122,7 +122,8 @@ FROM chart_test
 WHERE user_id=1860000;
 ```
 
-2.2. 测试结果  
+**2.2. 测试结果**
+
 **插入结果：**
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="440">
