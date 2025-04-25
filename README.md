@@ -51,29 +51,7 @@
 
 ### 模块三、 原始数据分库分表
 **测试百万级数据下单表的插入、查询性能**
-1. 创建测试表
-```sql
-use test_db;
-DROP TABLE IF EXISTS `chart_test`;
-CREATE TABLE `chart_test` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `goal` text COLLATE utf8mb4_unicode_ci COMMENT '分析目标',
-  `chart_data` text COLLATE utf8mb4_unicode_ci COMMENT '图表数据',
-  `chart_type` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '图表类型',
-  `gen_chart` text COLLATE utf8mb4_unicode_ci COMMENT '生成的图表数据',
-  `gen_result` text COLLATE utf8mb4_unicode_ci COMMENT '生成的分析结果',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除',
-  `user_id` bigint NOT NULL COMMENT '创建表用户的id',
-  `chart_name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT 'default',
-  `status` tinyint NOT NULL DEFAULT '0' COMMENT '0-待执行，1-已执行，2-执行中，3-已失败',
-  `info` text COLLATE utf8mb4_unicode_ci COMMENT '执行信息',
-  PRIMARY KEY (`id`,`update_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1913062471690395651 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='图表信息表';
-
-```
-2.1. 测试插入性能（300万条）
+1. 测试插入性能（300万条）
 ```sql
 use test_db;
 
