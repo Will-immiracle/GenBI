@@ -14,7 +14,7 @@
 
 ### 网站内容预览
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/login.png" width="800" height="500">
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/login.png" width="800" height="430">
 </div>
 
 
