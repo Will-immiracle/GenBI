@@ -51,7 +51,7 @@
 
 ### 模块三、 原始数据分库分表
 **测试百万级数据下单表的插入、查询性能**
-1. 测试插入性能（300万条）
+1.1. 测试插入性能（300万条）
 ```sql
 use test_db;
 
@@ -66,7 +66,7 @@ BEGIN
     set autocommit=0; -- 关闭自动提交事务，提高插入效率
     WHILE Var < loop_counts DO
         INSERT INTO `chart_test` (`goal`, `chart_data`, `chart_type`, `gen_chart`, `gen_result`, `create_time`, `update_time`, `is_delete`, `user_id`, `chart_name`, `status`, `info`)
-        VALUES ('生成用户饼图', NULL, '饼图', '\n{\n    \"title\": {\n        \"text\": \"每日人数分布\",\n        \"subtext\": \"数据来源：示例数据\",\n        \"left\": \"center\"\n    },\n    \"tooltip\": {\n        \"trigger\": \"item\"\n    },\n    \"legend\": {\n        \"orient\": \"vertical\",\n        \"left\": \"left\"\n    },\n    \"series\": [\n        {\n            \"name\": \"人数\",\n            \"type\": \"pie\",\n            \"radius\": \"50%\",\n            \"data\": [\n                { \"value\": 10, \"name\": \"1日\" },\n                { \"value\": 20, \"name\": \"2日\" },\n                { \"value\": 90, \"name\": \"3日\" },\n                { \"value\": 59, \"name\": \"4日\" },\n                { \"value\": 50, \"name\": \"5日\" },\n                { \"value\": 60, \"name\": \"6日\" }\n            ],\n            \"emphasis\": {\n                \"itemStyle\": {\n                    \"shadowBlur\": 10,\n                    \"shadowOffsetX\": 0,\n                    \"shadowColor\": \"rgba(0, 0, 0, 0.5)\"\n                }\n            }\n        }\n    ]\n}\n', '\n\n分析结论: 根据提供的数据，生成了一个饼图来展示每日的人数分布。从图表中可以看出，3日的人数最多，达到了90人，占据了总人数的最大比例。其次是6日和5日，人数分别为60人和50人。1日的人数最少，只有10人。通过这个饼图，可以直观地看出每日人数的相对多少，有助于快速了解数据的分布情况。', '2025-04-16 19:52:30', '2025-04-17 09:25:04', 0, 1910305532111773697, '饼图', 1, NULL);
+        VALUES ('生成用户饼图', NULL, '饼图', '\n{\n    \"title\": {\n        \"text\": \"每日人数分布\",\n        \"subtext\": \"数据来源：示例数据\",\n        \"left\": \"center\"\n    },\n    \"tooltip\": {\n        \"trigger\": \"item\"\n    },\n    \"legend\": {\n        \"orient\": \"vertical\",\n        \"left\": \"left\"\n    },\n    \"series\": [\n        {\n            \"name\": \"人数\",\n            \"type\": \"pie\",\n            \"radius\": \"50%\",\n            \"data\": [\n                { \"value\": 10, \"name\": \"1日\" },\n                { \"value\": 20, \"name\": \"2日\" },\n                { \"value\": 90, \"name\": \"3日\" },\n                { \"value\": 59, \"name\": \"4日\" },\n                { \"value\": 50, \"name\": \"5日\" },\n                { \"value\": 60, \"name\": \"6日\" }\n            ],\n            \"emphasis\": {\n                \"itemStyle\": {\n                    \"shadowBlur\": 10,\n                    \"shadowOffsetX\": 0,\n                    \"shadowColor\": \"rgba(0, 0, 0, 0.5)\"\n                }\n            }\n        }\n    ]\n}\n', '\n\n分析结论: 根据提供的数据，生成了一个饼图来展示每日的人数分布。从图表中可以看出，3日的人数最多，达到了90人，占据了总人数的最大比例。其次是6日和5日，人数分别为60人和50人。1日的人数最少，只有10人。通过这个饼图，可以直观地看出每日人数的相对多少，有助于快速了解数据的分布情况。', '2025-04-16 19:52:30', '2025-04-17 09:25:04', 0, Var, '饼图', 1, NULL);
         SET ID = ID + 1;
         SET Var = Var + 1;
     END WHILE;
@@ -77,10 +77,51 @@ delimiter ;  -- 界定符复原为默认的分号
 CALL BatchInsert(1, 5000000);  -- 调用存储过程
 
 ```
+1.2 测试查询性能（300万条） 
+开启慢查询：  
+```sql
+# 是否开启，这边为开启，默认情况下是off
+set global slow_query_log=on;
+
+# 设置慢查询阈值，单位是 s，默认为10s，这边的意思是查询耗时超过0.5s，便会记录到慢查询日志里面
+set global long_query_time=0.5;
+
+# 确定慢查询日志的文件名和路径
+mysql> show global variables like 'slow_query_log_file';
++---------------------+-------------------------------------------------------+
+| Variable_name       | Value                                                 |
++---------------------+-------------------------------------------------------+
+| slow_query_log_file | /usr/local/mysql/data/MacintoshdeMacBook-Pro-slow.log |
++---------------------+-------------------------------------------------------+
+1 row in set (0.00 sec)
+
+# 检查慢查询的详细指标，可以看到下面 slow_query_log = ON，long_query_time = 0.5 ，都是因为我们调整过的
+mysql> show global variables like '%quer%';
++----------------------------------------+-------------------------------------------------------+
+| Variable_name                          | Value                                                 |
++----------------------------------------+-------------------------------------------------------+
+| binlog_rows_query_log_events           | OFF                                                   |
+| ft_query_expansion_limit               | 20                                                    |
+| have_query_cache                       | NO                                                    |
+| log_queries_not_using_indexes          | OFF                                                   |
+| log_throttle_queries_not_using_indexes | 0                                                     |
+| long_query_time                        | 0.500000                                             |
+| query_alloc_block_size                 | 8192                                                  |
+| query_prealloc_size                    | 8192                                                  |
+| slow_query_log                         | ON                                                   |
+| slow_query_log_file                    | /usr/local/mysql/data/MacintoshdeMacBook-Pro-slow.log |
++----------------------------------------+-------------------------------------------------------+
+10 rows in set (0.01 sec)
+```
+测试查询性能：  
+
+
 2.2. 测试结果  
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="430">
 </div>
+
+**优化后单表的插入、查询性能**
 
 
 
