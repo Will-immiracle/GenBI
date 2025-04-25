@@ -79,7 +79,7 @@ CALL BatchInsert(1, 5000000);  -- 调用存储过程
 ```
 2.2. 测试结果  
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/流程图.drawio.svg" width="800" height="430">
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="430">
 </div>
 
 
