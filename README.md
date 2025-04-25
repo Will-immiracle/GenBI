@@ -123,12 +123,12 @@ WHERE user_id=1860000;
 ```
 
 2.2. 测试结果  
-**插入结果:**
+**插入结果：**
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="440">
 </div>
 
-**查询结果**
+**查询结果：**
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test2.png" width="800" height="600">
 </div>
