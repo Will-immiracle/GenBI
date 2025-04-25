@@ -3,7 +3,7 @@
 ## 项目简介
     可视化图表生成与数据分析平台。区别于传统BI，用户导入原始数据集、并输入分析诉求，即可生成可视化图表及分析结论.
 
-### 网站内容预览
+### 预览
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/login.png" width="800" height="430">
 </div>
@@ -62,6 +62,59 @@
 ### 模块二、 历史图表展示与分页查询
 
 ### 模块三、 原始数据分库分表
+**测试百万级数据下单表的插入、查询性能**
+1. 创建测试表
+```sql
+use test_db;
+DROP TABLE IF EXISTS `chart_test`;
+CREATE TABLE `chart_test` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `goal` text COLLATE utf8mb4_unicode_ci COMMENT '分析目标',
+  `chart_data` text COLLATE utf8mb4_unicode_ci COMMENT '图表数据',
+  `chart_type` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '图表类型',
+  `gen_chart` text COLLATE utf8mb4_unicode_ci COMMENT '生成的图表数据',
+  `gen_result` text COLLATE utf8mb4_unicode_ci COMMENT '生成的分析结果',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除',
+  `user_id` bigint NOT NULL COMMENT '创建表用户的id',
+  `chart_name` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT 'default',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '0-待执行，1-已执行，2-执行中，3-已失败',
+  `info` text COLLATE utf8mb4_unicode_ci COMMENT '执行信息',
+  PRIMARY KEY (`id`,`update_time`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1913062471690395651 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='图表信息表';
+
+```
+2.1. 测试插入性能（300万条）
+```sql
+use test_db;
+
+DROP PROCEDURE if EXISTS BatchInsert;
+delimiter $$
+CREATE PROCEDURE BatchInsert(IN initId INT, IN loop_counts INT)
+BEGIN
+    DECLARE Var INT;
+    DECLARE ID INT;
+    SET Var = 0;
+    SET ID = initId;
+    set autocommit=0; -- 关闭自动提交事务，提高插入效率
+    WHILE Var < loop_counts DO
+        INSERT INTO `chart_test` (`goal`, `chart_data`, `chart_type`, `gen_chart`, `gen_result`, `create_time`, `update_time`, `is_delete`, `user_id`, `chart_name`, `status`, `info`)
+        VALUES ('生成用户饼图', NULL, '饼图', '\n{\n    \"title\": {\n        \"text\": \"每日人数分布\",\n        \"subtext\": \"数据来源：示例数据\",\n        \"left\": \"center\"\n    },\n    \"tooltip\": {\n        \"trigger\": \"item\"\n    },\n    \"legend\": {\n        \"orient\": \"vertical\",\n        \"left\": \"left\"\n    },\n    \"series\": [\n        {\n            \"name\": \"人数\",\n            \"type\": \"pie\",\n            \"radius\": \"50%\",\n            \"data\": [\n                { \"value\": 10, \"name\": \"1日\" },\n                { \"value\": 20, \"name\": \"2日\" },\n                { \"value\": 90, \"name\": \"3日\" },\n                { \"value\": 59, \"name\": \"4日\" },\n                { \"value\": 50, \"name\": \"5日\" },\n                { \"value\": 60, \"name\": \"6日\" }\n            ],\n            \"emphasis\": {\n                \"itemStyle\": {\n                    \"shadowBlur\": 10,\n                    \"shadowOffsetX\": 0,\n                    \"shadowColor\": \"rgba(0, 0, 0, 0.5)\"\n                }\n            }\n        }\n    ]\n}\n', '\n\n分析结论: 根据提供的数据，生成了一个饼图来展示每日的人数分布。从图表中可以看出，3日的人数最多，达到了90人，占据了总人数的最大比例。其次是6日和5日，人数分别为60人和50人。1日的人数最少，只有10人。通过这个饼图，可以直观地看出每日人数的相对多少，有助于快速了解数据的分布情况。', '2025-04-16 19:52:30', '2025-04-17 09:25:04', 0, 1910305532111773697, '饼图', 1, NULL);
+        SET ID = ID + 1;
+        SET Var = Var + 1;
+    END WHILE;
+    COMMIT;
+END$$;
+
+delimiter ;  -- 界定符复原为默认的分号
+CALL BatchInsert(1, 5000000);  -- 调用存储过程
+
+```
+2.2. 测试结果  
+
+
+
 
 ### 模块四、 系统异步化
 **业务场景**
