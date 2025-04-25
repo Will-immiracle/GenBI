@@ -51,7 +51,7 @@
 
 ### 模块三、 原始数据分库分表
 **测试百万级数据下单表的插入、查询性能**
-1.1. 测试插入性能（300万条）
+**1.1. 测试插入性能（300万条）**
 ```sql
 use test_db;
 
@@ -77,7 +77,7 @@ delimiter ;  -- 界定符复原为默认的分号
 CALL BatchInsert(1, 3000000);  -- 调用存储过程
 
 ```
-1.2 测试查询性能（300万条） 
+**1.2 测试查询性能（300万条）**
 开启慢查询：  
 ```sql
 # 是否开启，这边为开启，默认情况下是off
@@ -124,12 +124,12 @@ WHERE user_id=1860000;
 
 **2.2. 测试结果**
 
-**插入结果：**
+### 插入结果：
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="440">
 </div>
 
-**查询结果：**
+### 查询结果：
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test2.png" width="800" height="600">
 </div>
