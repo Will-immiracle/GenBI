@@ -3,18 +3,6 @@
 ## 项目简介
     可视化图表生成与数据分析平台。区别于传统BI，用户导入原始数据集、并输入分析诉求，即可生成可视化图表及分析结论.
 
-### 预览
-<div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/login.png" width="800" height="430">
-</div>
-<div/>
-<div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/page1.png" width="800" height="430">
-</div>
-<div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/page3.png" width="800" height="430">
-</div>
-
 ## 核心功能
 ### Gen-BI 网站的基本功能：
 - [x] 用户输入分析需求、原始数据。得到**数据图表、分析结论**。
