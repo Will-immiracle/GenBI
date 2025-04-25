@@ -123,13 +123,14 @@ WHERE user_id=1860000;
 ```
 
 2.2. 测试结果  
-插入结果：  
+**插入结果:**
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="430">
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="1816" height="992">
 </div>
-查询结果：  
+
+**查询结果**
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test2.png" width="800" height="430">
+    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test2.png" width="1826" height="1364">
 </div>
 
 **优化后单表的插入、查询性能**
