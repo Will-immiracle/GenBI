@@ -9,10 +9,6 @@
 </div>
 <div/>
 <div align=center>
-    <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/register.png" width="800" height="430">
-</div>
-<div/>
-<div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/page1.png" width="800" height="430">
 </div>
 <div align=center>
