@@ -146,6 +146,10 @@ WHERE user_id=1860000;
 
 
 
+### 慢查询优化
+
+参考：https://tech.meituan.com/2014/06/30/mysql-index.html
+
 ### 模块四、 系统异步化
 **业务场景**
 
