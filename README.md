@@ -124,6 +124,8 @@ WHERE user_id=1860000;
 
 **2.2. 测试结果**
 
+分库分表参考： https://www.cnblogs.com/whgk/p/15251270.html  
+
 **插入结果**
 <div align=center>
     <img src="https://github.com/Will-immiracle/GenBI/blob/main/images/sql_test1.png" width="800" height="440">
